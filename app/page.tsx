@@ -15,8 +15,8 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="grid gap-4 sm:grid-cols-3"> 
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">.
             <h2 className="text-lg font-medium">PGN Ingestion</h2>
             <p className="mt-2 text-sm leading-6 text-zinc-400">
               Upload and parse chess games into structured records.
