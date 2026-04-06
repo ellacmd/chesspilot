@@ -4,8 +4,8 @@ import { parsePgn } from '@/lib/parse-pgn';
 import { extractPositionsFromPgn } from '@/lib/extract-positions';
 import { generateChunksFromPositions } from '@/lib/generate-chunks';
 import { summarizeChunks } from '@/lib/summarize-chunks';
-import { embedText } from '@/lib/embed'
-import { buildChunkText } from '@/lib/build-chunk-text'
+import { embedText } from '@/lib/embed';
+import { buildChunkText } from '@/lib/build-chunk-text';
 
 export async function POST(request: NextRequest) {
     try {
@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
             extractedPositions[extractedPositions.length - 1]?.ply ?? 0;
         const generatedChunks = generateChunksFromPositions(maxPly);
 
-    
         const summarizedChunks = summarizeChunks({
             chunks: generatedChunks,
             white: parsed.white,
@@ -64,35 +63,39 @@ export async function POST(request: NextRequest) {
             eco: parsed.eco,
             result: parsed.result,
         });
-        
+
         const chunksWithEmbeddings = await Promise.all(
             summarizedChunks.map(async (chunk) => {
-              const text = buildChunkText({
-                type: chunk.type,
-                summary: chunk.summary,
-                tags: chunk.tags,
-                opening: parsed.opening,
-              })
-          
-              const embedding = await embedText(text)
-          
-              return {
-                gameId: game.id,
-                type: chunk.type,
-                startPly: chunk.startPly,
-                endPly: chunk.endPly,
-                summary: chunk.summary,
-                tags: chunk.tags,
-                embedding,
-              }
-            })
-          )
-          
-          await prisma.chunk.createMany({
+                const movesSlice = parsed.movesJson.slice(
+                    chunk.startPly - 1,
+                    chunk.endPly,
+                );
+                const content = buildChunkText({
+                    type: chunk.type,
+                    summary: chunk.summary,
+                    tags: chunk.tags,
+                    opening: parsed.opening,
+                    moves: movesSlice,
+                });
+
+                const embedding = await embedText(content);
+
+                return {
+                    gameId: game.id,
+                    type: chunk.type,
+                    startPly: chunk.startPly,
+                    endPly: chunk.endPly,
+                    summary: chunk.summary,
+                    tags: chunk.tags,
+                    content,
+                    embedding,
+                };
+            }),
+        );
+
+        await prisma.chunk.createMany({
             data: chunksWithEmbeddings,
-          })
-
-
+        });
 
         return NextResponse.json({
             message: 'PGN ingested successfully.',

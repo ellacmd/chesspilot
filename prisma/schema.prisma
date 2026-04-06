@@ -57,6 +57,7 @@ model Chunk {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   embedding Json?  
+  content   String?
   game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   @@index([gameId])

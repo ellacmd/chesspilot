@@ -3,6 +3,8 @@ type BuildChunkTextArgs = {
     summary: string
     tags: string[]
     opening: string | null
+    moves: string[]
+
   }
   
   export function buildChunkText({
@@ -10,11 +12,13 @@ type BuildChunkTextArgs = {
     summary,
     tags,
     opening,
+    moves,
   }: BuildChunkTextArgs) {
     return [
       `Type: ${type}`,
       `Opening: ${opening ?? 'unknown'}`,
       `Summary: ${summary}`,
+      `Moves: ${moves.join(' ')}`,
       `Tags: ${tags.join(', ')}`,
     ].join('\n')
   }
