@@ -58,8 +58,6 @@ export default function GameViewer({ game }: GameViewerProps) {
         );
     }, [currentPly, game.chunks]);
 
-    console.log(game, 'done');
-
     const goToPrevious = () => {
         setCurrentPly((prev) => Math.max(prev - 1, 0));
     };
